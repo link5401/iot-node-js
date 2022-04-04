@@ -1,2 +1,3 @@
 require('dotenv/config')
-require('./../hello')
+require('./../app')
+require('./../passport-config')

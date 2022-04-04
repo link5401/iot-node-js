@@ -27,6 +27,7 @@
         <!-- Custom Fonts -->
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
+       
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -35,9 +36,8 @@
         <![endif]-->
     </head>
     <body>
-
+       
         <div id="wrapper">
-
             <!-- Navigation -->
             <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
                 <div class="navbar-header">
@@ -112,16 +112,24 @@
                     </li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-user fa-fw"></i> User <b class="caret"></b>
+                            <i class="fa fa-user fa-fw"></i> <%= email%> <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
                             <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
                             </li>
                             <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                             </li>
-                            <li class="divider"></li>
-                            <li><a href="/login"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                            </li>
+                            <li class="divider"></li> 
+                            
+                                <form  action="/logout?_method=DELETE" method="POST">
+                                 <button style="padding-left: 3rem; padding-right: 6rem;
+                                        "type="submit"><i class="fa fa-sign-out fa-fw"></i> Logout
+                                         </button> 
+                                </form>
+                          
+                            
+                            
+                        
                         </ul>
                     </li>
                 </ul>
@@ -172,7 +180,7 @@
                         <!-- /.col-lg-12 -->
                     </div>
                     <!-- /.row -->
-                    <div class="row">
+                    <div class="row" id ="info">
                         <div class="col-lg-3 col-md-6">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
@@ -181,7 +189,8 @@
                                             <i class="fa fa-thermometer fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%= tempsList[2]._temp%></div>
+                                          
+                                            <div class="huge" id="tempUpdate"></div>
                                             <div>Temperature!</div>
                                         </div>
                                     </div>
@@ -204,7 +213,7 @@
                                             <i class="fa fa-tint fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%= humidsList[2]._humidity%></div>
+                                            <div class="huge" id ="humidUpdate"></div>
                                             <div>Humidity!</div>
                                         </div>
                                     </div>
@@ -227,7 +236,7 @@
                                             <i class="fa fa-toggle-on fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%=togglesList[2]._value%></div>
+                                            <div class="huge" id ="toggleUpdate"></div>
                                             <div>Relay status</div>
                                         </div>
                                     </div>
@@ -250,7 +259,7 @@
                                             <i class="fa fa-thermometer-empty fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge">To implement</div>
+                                            <div class="huge" id = "soilUpdate"></div>
                                             <div>Soil moisture</div>
                                         </div>
                                     </div>
@@ -301,6 +310,7 @@
                                         <div class=" ">
                                             <div class="table-responsive">
                                                 <table class="table table-bordered table-hover table-striped">
+                                           
                                                     <thead>
                                                     <tr>
                                                         <th>#ID</th>
@@ -309,13 +319,24 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <%tempsList.forEach(temp => {%>
+                                                       
                                                             <tr>
-                                                                <th scope="row"><%= temp._id %></th>
-                                                                <td><%= temp._temp %></td>
-                                                                <td><%= temp.datetime %></td>
+                                                                <th scope="row" id = "tempID1"></th>
+                                                                <td id = "tempVal1"></td>
+                                                                <td id = "tempDate1"></td>     
                                                             </tr>
-                                                        <%})%>
+                                                            <tr>
+                                                                <th scope="row" id = "tempID2"></th>                                                           
+                                                                <td id = "tempVal2"></td>
+                                                                <td id = "tempDate2"></td>   
+                                                            </tr> 
+                                                            <tr>
+                                                                <th scope="row" id = "tempID3"></th>
+                                                                <td id = "tempVal3"></td>
+                                                                <td id = "tempDate3"></td>                                                   
+                
+                                                            </tr>
+                                                     
                                                     </tbody>
 
                                                     <thead>
@@ -326,31 +347,75 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <%humidsList.forEach(humid => {%>
-                                                                <tr>
-                                                                    <th scope="row"><%= humid._id %></th>
-                                                                    <td><%= humid._humidity %></td>
-                                                                    <td><%= humid.datetime %></td>
-                                                                </tr>
-                                                            <%})%>
+                                                                                                                  
+                                                            <tr>
+                                                                <th scope="row" id = "humidID1"></th>
+                                                                <td id = "humidVal1"></td>
+                                                                <td id = "humidDate1"></td>     
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row" id = "humidID2"></th>                                                           
+                                                                <td id = "humidVal2"></td>
+                                                                <td id = "humidDate2"></td>   
+                                                            </tr> 
+                                                            <tr>
+                                                                <th scope="row" id = "humidID3"></th>
+                                                                <td id = "humidVal3"></td>
+                                                                <td id = "humidDate3"></td>                                                   
+                
+                                                            </tr>
+                                                     
                                                         </tbody>
 
                                                         <thead>
                                                             <tr>
                                                                 <th>#ID</th>
-                                                                <th>Value</th>
+                                                                <th>Relay Value</th>
                                                                 <th>Date</th>                                              
                                                             </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <%togglesList.forEach(toggle => {%>
-                                                                    <tr>
-                                                                        <th scope="row"><%= toggle._id %></th>
-                                                                        <td><%= toggle._value %></td>
-                                                                        <td><%= toggle.datetime %></td>
-                                                                    </tr>
-                                                                <%})%>
+                                                                <tr>
+                                                                    <th scope="row" id = "toggleID1"></th>
+                                                                    <td id = "toggleVal1"></td>
+                                                                    <td id = "toggleDate1"></td>     
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row" id = "toggleID2"></th>                                                           
+                                                                    <td id = "toggleVal2"></td>
+                                                                    <td id = "toggleDate2"></td>   
+                                                                </tr> 
+                                                                <tr>
+                                                                    <th scope="row" id = "toggleID3"></th>
+                                                                    <td id = "toggleVal3"></td>
+                                                                    <td id = "toggleDate3"></td>   
+                                                                </tr>
                                                             </tbody>
+                                                  
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>#ID</th>
+                                                                    <th>Soil Moisture</th>
+                                                                    <th>Date</th>                                              
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row" id = "soilID1"></th>
+                                                                        <td id = "soilVal1"></td>
+                                                                        <td id = "soilDate1"></td>     
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row" id = "soilID2"></th>                                                           
+                                                                        <td id = "soilVal2"></td>
+                                                                        <td id = "soilDate2"></td>   
+                                                                    </tr> 
+                                                                    <tr>
+                                                                        <th scope="row" id = "soilID3"></th>
+                                                                        <td id = "soilVal3"></td>
+                                                                        <td id = "soilDate3"></td>   
+                                                                    </tr>
+                                                                </tbody>
                                                 </table>
                                             </div>
                                             <!-- /.table-responsive -->
@@ -377,7 +442,103 @@
 
         </div>
         <!-- /#wrapper -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+    
+            const tempUpdate = document.querySelector('#tempUpdate')
+            const humidUpdate = document.querySelector('#humidUpdate')
+            const toggleUpdate = document.querySelector('#toggleUpdate')
+            const soilUpdate = document.querySelector('#soilUpdate')
+                //temp
+            const tempID1 = document.querySelector('#tempID1')
+            const tempID2 = document.querySelector('#tempID2')
+            const tempID3 = document.querySelector('#tempID3')
+            const tempVal1 = document.querySelector('#tempVal1')
+            const tempVal2 = document.querySelector('#tempVal2')
+            const tempVal3 = document.querySelector('#tempVal3')
+            const tempDate1 = document.querySelector('#tempDate1')
+            const tempDate2 = document.querySelector('#tempDate2')
+            const tempDate3 = document.querySelector('#tempDate3')
+                //humid
+            const humidID1 = document.querySelector('#humidID1')
+            const humidID2 = document.querySelector('#humidID2')
+            const humidID3 = document.querySelector('#humidID3')
+            const humidVal1 = document.querySelector('#humidVal1')
+            const humidVal2 = document.querySelector('#humidVal2')
+            const humidVal3 = document.querySelector('#humidVal3')
+            const humidDate1 = document.querySelector('#humidDate1')
+            const humidDate2 = document.querySelector('#humidDate2')
+            const humidDate3 = document.querySelector('#humidDate3')
+                //toggle
+            const toggleID1 = document.querySelector('#toggleID1')
+            const toggleID2 = document.querySelector('#toggleID2')
+            const toggleID3 = document.querySelector('#toggleID3')
+            const toggleVal1 = document.querySelector('#toggleVal1')
+            const toggleVal2 = document.querySelector('#toggleVal2')
+            const toggleVal3 = document.querySelector('#toggleVal3')
+            const toggleDate1 = document.querySelector('#toggleDate1')
+            const toggleDate2 = document.querySelector('#toggleDate2')
+            const toggleDate3 = document.querySelector('#toggleDate3')
+                //soil
+            const soilID1 = document.querySelector('#soilID1')
+            const soilID2 = document.querySelector('#soilID2')
+            const soilID3 = document.querySelector('#soilID3')
+            const soilVal1 = document.querySelector('#soilVal1')
+            const soilVal2 = document.querySelector('#soilVal2')
+            const soilVal3 = document.querySelector('#soilVal3')
+            const soilDate1 = document.querySelector('#soilDate1')
+            const soilDate2 = document.querySelector('#soilDate2')
+            const soilDate3 = document.querySelector('#soilDate3')
+            socket.on('info',(info)=>{
+                console.log(info.tempsList[0]._temp)               
+                tempUpdate.textContent = info.tempsList[0]._temp;  
+                humidUpdate.textContent = info.humidsList[0]._humidity;          
+                toggleUpdate.textContent = info.togglesList[0]._value;          
+                soilUpdate.textContent = info.soilsList[0]._soil;          
 
+                tempID1.textContent = info.tempsList[0]._id;
+                tempVal1.textContent = info.tempsList[0]._temp;
+                tempDate1.textContent = info.tempsList[0].datetime;
+                tempID2.textContent = info.tempsList[1]._id;
+                tempVal2.textContent = info.tempsList[1]._temp;
+                tempDate2.textContent = info.tempsList[1].datetime;
+                tempID3.textContent = info.tempsList[2]._id;
+                tempVal3.textContent = info.tempsList[2]._temp;
+                tempDate3.textContent = info.tempsList[2].datetime;
+
+                humidID1.textContent = info.humidsList[0]._id;
+                humidVal1.textContent = info.humidsList[0]._humidity;
+                humidDate1.textContent = info.humidsList[0].datetime;
+                humidID2.textContent = info.humidsList[1]._id;
+                humidVal2.textContent = info.humidsList[1]._humidity;
+                humidDate2.textContent = info.humidsList[1].datetime;
+                humidID3.textContent = info.humidsList[2]._id;
+                humidVal3.textContent = info.humidsList[2]._humidity;
+                humidDate3.textContent = info.humidsList[2].datetime;
+
+                toggleID1.textContent = info.togglesList[0]._id;
+                toggleVal1.textContent = info.togglesList[0]._value;
+                toggleDate1.textContent = info.togglesList[0].datetime;
+                toggleID2.textContent = info.togglesList[1]._id;
+                toggleVal2.textContent = info.togglesList[1]._value;
+                toggleDate2.textContent = info.togglesList[1].datetime;
+                toggleID3.textContent = info.togglesList[2]._id;
+                toggleVal3.textContent = info.togglesList[2]._value;
+                toggleDate3.textContent = info.togglesList[2].datetime;
+
+                soilID1.textContent = info.soilsList[0]._id;
+                soilVal1.textContent = info.soilsList[0]._soil;
+                soilDate1.textContent = info.soilsList[0].datetime;
+                soilID2.textContent = info.soilsList[1]._id;
+                soilVal2.textContent = info.soilsList[1]._soil;
+                soilDate2.textContent = info.soilsList[1].datetime;
+                soilID3.textContent = info.soilsList[2]._id;
+                soilVal3.textContent = info.soilsList[2]._soil;
+                soilDate3.textContent = info.soilsList[2].datetime;
+            })
+        </script>
+        
         <!-- jQuery -->
         <script src="../js/jquery.min.js"></script>
 
