@@ -123,6 +123,8 @@ const res = require('express/lib/response');
             console.log('added signal ' + newSignal)       
           })
           break;
+        }
+      switch(req.body.autoButton){
         case "AUTO ON":
           signal = {
             _value: "2",
