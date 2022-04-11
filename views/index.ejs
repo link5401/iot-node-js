@@ -523,16 +523,16 @@
                 }
 
                 var trace1 = {
-                        x: xtempdate,
-                        y: ytempval,
+                        x:     xtempdate,
+                        y:     ytempval,
                         type: 'scatter',
                         mode: "lines",
                         name: "Temperature",
                         line: {color: '#7F7F7F'}
                 }
                 var trace2 = {
-                        x: xhumiddate,
-                        y: yhumidval,
+                        x:     xhumiddate,
+                        y:     yhumidval,
                         type: 'scatter',
                         mode: "lines",
                         name: "Humidity",
@@ -540,8 +540,10 @@
                 }
                 var data = [trace1, trace2]
 
-                 Plotly.newPlot('temp-humid-line', data);
+                Plotly.newPlot('temp-humid-line', data);
                 
+                
+
                 tempUpdate.textContent = info.tempsList[0]._temp;  
                 humidUpdate.textContent = info.humidsList[0]._humidity;          
                 toggleUpdate.textContent = info.togglesList[0]._value;          
@@ -586,6 +588,37 @@
                 soilID3.textContent = info.soilsList[2]._id;
                 soilVal3.textContent = info.soilsList[2]._soil;
                 soilDate3.textContent = info.soilsList[2].datetime;
+
+                //configure states of buttons
+                var newestToggle = info.togglesList[0]
+                switch(newestToggle._value) {
+                    case "1":
+                        document.getElementById("toggleButton").disabled = true;
+                        document.getElementById("autoButton").value="AUTO OFF";
+                        document.getElementById("toggleButton").value="MANUAL ON"
+                        break;
+                    case "2":
+                        document.getElementById("toggleButton").disabled = false;
+                        document.getElementById("toggleButton").value="MANUAL ON";
+                        break;
+                    case "3":
+                        document.getElementById("toggleButton").disabled = false;
+                        document.getElementById("toggleButton").value="MANUAL OFF";
+                        break;
+                }
+                
+                //check if information received exceeded certain limits
+                
+                var newestTemp = info.tempsList[0]
+                tempUpdate.style.color = (newestTemp._temp >= 60) ? "#ff0000 " : "white";
+
+                var newestHumid = info.humidsList[0]
+                humidUpdate.style.color = (newestHumid._humidity >= 100) ? "#ff0000 " : "white";
+
+                var newestSoil = info.soilsList[0]
+                soilUpdate.style.color = (newestSoil._soil <= 10) ? "#ff0000 " : "white";
+               
+
             })
         </script>
         <script>

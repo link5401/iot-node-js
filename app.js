@@ -186,13 +186,14 @@ const res = require('express/lib/response');
     while (true){
     const temps = await temp.find().sort([['datetime', -1]]).limit(10)
     const humids = await humid.find().sort([['datetime', -1]]).limit(10)  
-    const toggles = await toggle.find().sort([['datetime', -1]]).limit(10)  
-    const soils = await soil.find().sort([['datetime', -1]]).limit(10)   
+    const toggles = await toggle.find().sort([['datetime', -1]]).limit(3)  
+    const soils = await soil.find().sort([['datetime', -1]]).limit(10) 
+ 
                   io.emit('info',{
                       tempsList:temps,
                       humidsList:humids,
                       togglesList:toggles,
-                      soilsList:soils
+                      soilsList:soils,
                   })
                   
            await delay(2000);

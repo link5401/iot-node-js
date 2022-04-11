@@ -8,7 +8,7 @@
         <meta name="author" content="">
 
         <title>waterSystemGroup</title>
-
+<!-- 
         <!-- Bootstrap Core CSS -->
         <link href="../css/bootstrap.min.css" rel="stylesheet">
 
@@ -19,7 +19,17 @@
         <link href="../css/startmin.css" rel="stylesheet">
 
         <!-- Custom Fonts -->
-        <link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+        <title>Sign Up</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+    
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+        <link rel="stylesheet" href="css/style.css">
+    
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -30,7 +40,44 @@
     </head>
     <body>
 
-        <div class="container">
+        <body>
+            <section class="ftco-section">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-7 col-lg-5">
+                            <div class="login-wrap">
+                          <div class="img" style="background-image: url(images/bg.png);"></div>
+                          <h3 class="text-center mb-4">Sign In</h3>
+                            <form role="form" action ="/login" method = "POST">
+                                <% if(messages.error) {%>
+                                    <%= messages.error %>
+                                    <% } %>
+                              <div class="form-group mb-3">
+                     
+                                    <input type="email" id="email" name="email" class="form-control" required placeholder="Sign in with your email">
+              
+                              </div>
+                        <div class="form-group mb-3">
+                      
+                          <input type="password" id="password" name="password" class="form-control" required placeholder ="Sign in with your password">
+              
+                          <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
+                        </div>
+                     
+                      </form>
+                      <p>I don't have an account! <a  href="/register">Register</a></p>
+                    </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <!-- <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <div class="login-panel panel panel-default">
@@ -55,7 +102,7 @@
                                         </label>
                                     </div>
                                     <!-- Change this to a button or input when using this as a form -->
-                                    <button type="submit" class="btn btn-lg btn-success btn-block">Login</button>
+                                    <!-- <button type="submit" class="btn btn-lg btn-success btn-block">Login</button>
                                     <a href="/register">Register</a>
                                 </fieldset>
                             </form>
@@ -63,7 +110,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --> 
 
         <!-- jQuery -->
         <script src="../js/jquery.min.js"></script>
