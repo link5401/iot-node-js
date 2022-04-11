@@ -1,28 +1,28 @@
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
-
-const fs = require('fs')
-
-const express = require('express');
-const morgan = require('morgan');
-const mongoose = require('mongoose');
-const { runMain } = require('module');
-const { userInfo } = require('os');
-const { Console } = require('console');
-const { append } = require('express/lib/response');
-const  path  =require('path');
-const ejs = require('ejs');
-const dotenv = require('dotenv');
 const dbURI = process.env.SECRET_URI;
-const bodyParser = require('body-parser');
-const axios = require('axios');
-const passport = require('passport')
-const methodOverride = require('method-override')
-const flash = require('express-flash')
-const session = require('express-session')
-var http = require('http');
-const moment = require('moment-timezone');
+const fs =                require('fs');
+const express =           require('express');
+const morgan =            require('morgan');
+const mongoose =          require('mongoose');
+const { runMain } =       require('module');
+const { userInfo } =      require('os');
+const { Console } =       require('console');
+const { append } =        require('express/lib/response');
+const  path  =            require('path');
+const ejs =               require('ejs');
+const dotenv =            require('dotenv');
+const bodyParser =        require('body-parser');
+const axios =             require('axios');
+const passport =          require('passport')
+const methodOverride =    require('method-override')
+const flash =             require('express-flash')
+const session =           require('express-session')
+var http =                require('http');
+const moment =            require('moment-timezone');
+const models =            require('./model')
+
 const app = express();
 const server = http.createServer(app)
 const {Server} = require('socket.io');
@@ -46,12 +46,12 @@ const PORT = process.env.PORT || 8080;
   mongoose.connection.on('connected', () => {
       console.log('mongoose is connected!!!');
   });
-  const models = require('./model')
-  const temp = models.temp
-  const humid = models.humid
-  const toggle = models.toggle
-  const soil = models.soil
-  const reg = models.reg
+ 
+  const temp =    models.temp
+  const humid =   models.humid
+  const toggle =  models.toggle
+  const soil =    models.soil
+  const reg =     models.reg
 
   //init passport
   const initializePassport = require('./passport-config');
@@ -100,46 +100,52 @@ const res = require('express/lib/response');
  
  app.post('/home', checkAuthenticated,(req, res) =>{
      var signal = {}
-     if (req.body.toggleButton == "MANUAL ON"){
-       signal = {
-         _value: "2",
-         datetime: getdate(),
-         user: req.user.email
-       }
-       newSignal = new toggle(signal)
-       newSignal.save((e)=>{ 
-            console.log('added signal ' + newSignal)          
-       })
-     } else if (req.body.toggleButton == "MANUAL OFF") { 
-       signal = {
-      _value: "3",
-      datetime: getdate(),
-      user: req.user.email
-      }
-    newSignal = new toggle(signal)
-    newSignal.save((e)=>{    
-         console.log('added signal ' + newSignal)       
-    })
-  } else if (req.body.autoButton == "AUTO OFF") { 
-      signal = {
-        _value: "1",
-        datetime: getdate(),
-        user: req.user.email
-      }
-      newSignal = new toggle(signal)
-      newSignal.save((e)=>{
-        console.log('added signal ' + newSignal)   
-   })
-  } else if (req.body.autoButton == "AUTO ON") { 
-      signal = {
-        _value: "2",
-        datetime: getdate(),
-        user: req.user.email
-      }
-      newSignal = new toggle(signal)
-      newSignal.save((e)=>{
-            console.log('added signal ' + newSignal)        
-      })}
+     switch(req.body.toggleButton){
+        case "MANUAL ON":
+          signal = {
+            _value: "2",
+            datetime: getdate(),
+            user: req.user.email
+         }
+          newSignal = new toggle(signal)
+          newSignal.save((e)=>{ 
+              console.log('added signal ' + newSignal)          
+          })
+          break;
+        case "MANUAL OFF":
+          signal = {
+            _value: "3",
+            datetime: getdate(),
+            user: req.user.email
+          }
+          newSignal = new toggle(signal)
+          newSignal.save((e)=>{    
+            console.log('added signal ' + newSignal)       
+          })
+          break;
+        case "AUTO ON":
+          signal = {
+            _value: "2",
+            datetime: getdate(),
+            user: req.user.email
+          }
+          newSignal = new toggle(signal)
+          newSignal.save((e)=>{
+              console.log('added signal ' + newSignal)        
+          })
+          break;
+        case "AUTO OFF":
+          signal = {
+            _value: "1",
+            datetime: getdate(),
+            user: req.user.email
+          }
+          newSignal = new toggle(signal)
+          newSignal.save((e)=>{
+            console.log('added signal ' + newSignal)   
+          })
+          break;
+     }
  })
 
   app.get('/register', checkNotAuthenticated ,(req,res) => {
@@ -153,7 +159,7 @@ const res = require('express/lib/response');
       }
       newUser = new reg(registryInfo)
       if (await reg.findOne({email: newUser.email}) != null){
-        res.render('register', {message: 'email already used'})
+        res.render('register', {message: 'Email already used!'})
       } else{
         newUser.save((e) => {
             if(e) {
@@ -176,7 +182,7 @@ const res = require('express/lib/response');
     failureRedirect: '/login',
     failureFlash: true
   }))
-
+  //DELETE method for '/logout'
   app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/login')
@@ -184,11 +190,12 @@ const res = require('express/lib/response');
 
   async function broadcastInfo(){
     while (true){
+    //queries
     const temps = await temp.find().sort([['datetime', -1]]).limit(10)
     const humids = await humid.find().sort([['datetime', -1]]).limit(10)  
     const toggles = await toggle.find().sort([['datetime', -1]]).limit(3)  
     const soils = await soil.find().sort([['datetime', -1]]).limit(10) 
- 
+                  //realtime comms
                   io.emit('info',{
                       tempsList:temps,
                       humidsList:humids,
@@ -200,7 +207,7 @@ const res = require('express/lib/response');
     }
   
   }
-
+  //check for authentication
   function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next()

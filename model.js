@@ -37,11 +37,11 @@ const soilSchema = new Schema({
   versionKey: false
 });
 //Model
-const reg = mongoose.model('users', userSchema);
-const temp = mongoose.model('temps', tempSchema);
-const humid = mongoose.model('humids', humidSchema);
-const toggle = mongoose.model('toggles', toggleSchema);
-const soil = mongoose.model('soils',soilSchema);
+const reg =     mongoose.model('users', userSchema);
+const temp =    mongoose.model('temps', tempSchema);
+const humid =   mongoose.model('humids', humidSchema);
+const toggle =  mongoose.model('toggles', toggleSchema);
+const soil =    mongoose.model('soils',soilSchema);
 module.exports = {
    reg,
    temp,
