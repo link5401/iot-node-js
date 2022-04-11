@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
+const fs = require('fs')
 
 const express = require('express');
 const morgan = require('morgan');
@@ -21,6 +22,7 @@ const methodOverride = require('method-override')
 const flash = require('express-flash')
 const session = require('express-session')
 var http = require('http');
+const moment = require('moment-timezone');
 const app = express();
 const server = http.createServer(app)
 const {Server} = require('socket.io');
@@ -31,7 +33,7 @@ const io = new Server(server);
   })
 function getdate(){
   const timeElapsed = Date.now();
-  const today = new Date(timeElapsed);
+  const today = new Date(timeElapsed)
   return today;
 }
 
@@ -44,40 +46,16 @@ const PORT = process.env.PORT || 8080;
   mongoose.connection.on('connected', () => {
       console.log('mongoose is connected!!!');
   });
-  //Schema
-  const  Schema = mongoose.Schema;
-  const userSchema = new Schema({
-    email: String,
-    password: String
-});
-  const tempSchema = new Schema({
-    _temp: Number,
-    datetime: Date 
+  const models = require('./model')
+  const temp = models.temp
+  const humid = models.humid
+  const toggle = models.toggle
+  const soil = models.soil
+  const reg = models.reg
 
-  });
-
-  const humidSchema = new Schema({
-    _humidity: Number,
-    datetime: Date
-  });
-
-  const toggleSchema = new Schema({
-      _value: String,
-      datetime: Date
-  });
-
-  const soilSchema = new Schema({
-      _soil: String,
-      datetime: Date
-  });
- //Model
-  const reg = mongoose.model('users', userSchema);
-  const temp = mongoose.model('temps', tempSchema);
-  const humid = mongoose.model('humids', humidSchema);
-  const toggle = mongoose.model('toggles', toggleSchema);
-  const soil = mongoose.model('soils',soilSchema);
   //init passport
-  const initializePassport = require('./passport-config')
+  const initializePassport = require('./passport-config');
+const res = require('express/lib/response');
   initializePassport(
     passport, 
     async(email) => {
@@ -104,15 +82,66 @@ const PORT = process.env.PORT || 8080;
   app.use(methodOverride('_method'))
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }))
+
   
-  app.get('/home', checkAuthenticated,(req, res) => {
-   
+
+  broadcastInfo()
+  app.get('/home', checkAuthenticated, async (req, res) => {
         res.render('index',{
           email: req.user.email
         })    
-     // broadcastInfo()
   });
+
+  app.get('/stats',checkAuthenticated,(req,res)=>{
+      res.render('stats',{
+        email: req.user.email
+      })
+  })
  
+ app.post('/home', checkAuthenticated,(req, res) =>{
+     var signal = {}
+     if (req.body.toggleButton == "MANUAL ON"){
+       signal = {
+         _value: "2",
+         datetime: getdate(),
+         user: req.user.email
+       }
+       newSignal = new toggle(signal)
+       newSignal.save((e)=>{ 
+            console.log('added signal ' + newSignal)          
+       })
+     } else if (req.body.toggleButton == "MANUAL OFF") { 
+       signal = {
+      _value: "3",
+      datetime: getdate(),
+      user: req.user.email
+      }
+    newSignal = new toggle(signal)
+    newSignal.save((e)=>{    
+         console.log('added signal ' + newSignal)       
+    })
+  } else if (req.body.autoButton == "AUTO OFF") { 
+      signal = {
+        _value: "1",
+        datetime: getdate(),
+        user: req.user.email
+      }
+      newSignal = new toggle(signal)
+      newSignal.save((e)=>{
+        console.log('added signal ' + newSignal)   
+   })
+  } else if (req.body.autoButton == "AUTO ON") { 
+      signal = {
+        _value: "2",
+        datetime: getdate(),
+        user: req.user.email
+      }
+      newSignal = new toggle(signal)
+      newSignal.save((e)=>{
+            console.log('added signal ' + newSignal)        
+      })}
+ })
+
   app.get('/register', checkNotAuthenticated ,(req,res) => {
     res.render('register', {message: ''})
   })
@@ -138,7 +167,7 @@ const PORT = process.env.PORT || 8080;
     } 
   )
 
-  app.get('/login', checkNotAuthenticated,(req, res) => {
+  app.get('/login', checkNotAuthenticated, (req, res) => {
     res.render('login')
   })
 
@@ -155,10 +184,10 @@ const PORT = process.env.PORT || 8080;
 
   async function broadcastInfo(){
     while (true){
-      temp.find({}, function(err,temps){
-        humid.find({},function(err,humids){
-            toggle.find({},function(err,toggles){
-              soil.find({},function(err,soils){
+    const temps = await temp.find().sort([['datetime', -1]]).limit(10)
+    const humids = await humid.find().sort([['datetime', -1]]).limit(10)  
+    const toggles = await toggle.find().sort([['datetime', -1]]).limit(10)  
+    const soils = await soil.find().sort([['datetime', -1]]).limit(10)   
                   io.emit('info',{
                       tempsList:temps,
                       humidsList:humids,
@@ -166,23 +195,16 @@ const PORT = process.env.PORT || 8080;
                       soilsList:soils
                   })
                   
-              }).sort([['datetime', -1]])
-              .limit(3)   
-              }).sort([['datetime', -1]])
-              .limit(3)
-        }).sort([['datetime', -1]])
-        .limit(3)
-    })  .sort([['datetime', -1]])
-        .limit(3)       
-        await delay(10000)
+           await delay(2000);
     }
+  
   }
-  broadcastInfo()
+
   function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next()
     }
-  
+   
     res.redirect('/login')
   }
   
@@ -192,7 +214,7 @@ const PORT = process.env.PORT || 8080;
     }
     next()
   }
-  server.listen(PORT,()=>{
+  server.listen(PORT,() => {
     console.log('server listening to ' + PORT)
   })
-  //app.listen(PORT, console.log('Server is starting at' + PORT))
+  

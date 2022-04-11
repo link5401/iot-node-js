@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Startmin - Bootstrap Admin Theme</title>
+        <title>waterSystemGroup</title>
 
         <!-- Bootstrap Core CSS -->
         <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -23,11 +23,12 @@
 
         <!-- Morris Charts CSS -->
         <link href="css/morris.css" rel="stylesheet">
-
+        
+        <link href ="css/toggle-switch.css" rel="stylesheet">
         <!-- Custom Fonts -->
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-       
+        <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -41,7 +42,7 @@
             <!-- Navigation -->
             <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="index.html">Startmin</a>
+                    <a class="navbar-brand" href="/home">IoT</a>
                 </div>
 
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -52,7 +53,7 @@
                 </button>
 
                 <ul class="nav navbar-nav navbar-left navbar-top-links">
-                    <li><a href="#"><i class="fa fa-home fa-fw"></i> Website</a></li>
+                    <li><a href="/home"><i class="fa fa-home fa-fw"></i> Home</a></li>
                 </ul>
 
                 <ul class="nav navbar-right navbar-top-links">
@@ -150,18 +151,11 @@
                                 <!-- /input-group -->
                             </li>
                             <li>
-                                <a href="index.html" class="active"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                                <a href="/home" class="active"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                             </li>
                             <li>
-                                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
-                                    <li>
-                                        <a href="flot.html">Temperature</a>
-                                    </li>
-                                    <li>
-                                        <a href="morris.html">Humidity</a>
-                                    </li>
-                                </ul>
+                                <a href="/stats" class="active"><i class="fa fa-dashboard fa-fw"></i> Statistics</a>
+                               
                                 <!-- /.nav-second-level -->
                             </li>
                             
@@ -251,6 +245,7 @@
                                 </a>
                             </div>
                         </div>
+                        
                         <div class="col-lg-3 col-md-6">
                             <div class="panel panel-red">
                                 <div class="panel-heading">
@@ -276,11 +271,30 @@
                         </div>
                     </div>
                     <!-- /.row -->
+                
+                    <!-- Rounded switch -->
+                    <!-- <label class="switch">
+                        <form action="/home" method="POST">
+                        <input type="checkbox"id = "toggleButton" name ="toggleButton" value ="false" 
+                        style ="color:blue" onclick = "toggle(this);"></input>
+                        <span class="slider round"></span>
+                    </form>
+                    </label> -->
+                    <form action="/home" method="POST">
+                        <input type = "submit" id = "autoButton" class="btn btn-lg btn-primary" name ="autoButton"value ="AUTO ON" 
+                        style ="color:blue" onclick = "toggleAuto(this);"></input>
+                    </form>
+                    
+                    <form action="/home" method="POST">
+                    <input type = "submit" id = "toggleButton" class="btn btn-lg btn-primary" name ="toggleButton"value ="MANUAL OFF" 
+                    style ="color:blue" onclick = "toggleToggle(this);"></input>
+                    </form>
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <i class="fa fa-bar-chart-o fa-fw"></i> Temperature&Humidity Chart 
+                                    <i class="fa fa-bar-chart-o fa-fw"></i> Recent stats
+                                    <div class="pull-right">
                                     <div class="pull-right">
                                         <div class="btn-group">
                                       
@@ -289,7 +303,7 @@
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
-                                    <div id="morris-area-chart"></div>
+                                    <div id="temp-humid-line" style="width:90%;height:250px;"></div>
                                 </div>
                                 <!-- /.panel-body -->
                             </div>
@@ -420,6 +434,7 @@
                                             </div>
                                             <!-- /.table-responsive -->
                                         </div>
+                                        
                                         <!-- /.col-lg-4 (nested) -->
                                         
                                         <!-- /.col-lg-8 (nested) -->
@@ -442,10 +457,15 @@
 
         </div>
         <!-- /#wrapper -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+        <script type="text/javascript">
+            
+        </script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
-    
+                 
             const tempUpdate = document.querySelector('#tempUpdate')
             const humidUpdate = document.querySelector('#humidUpdate')
             const toggleUpdate = document.querySelector('#toggleUpdate')
@@ -490,8 +510,38 @@
             const soilDate1 = document.querySelector('#soilDate1')
             const soilDate2 = document.querySelector('#soilDate2')
             const soilDate3 = document.querySelector('#soilDate3')
-            socket.on('info',(info)=>{
-                console.log(info.tempsList[0]._temp)               
+            socket.on('info',(info)=>{ 
+                var xtempdate = []
+                var ytempval  = []
+                var xhumiddate = []
+                var yhumidval  = []   
+                for(let i = 0; i < 3; i++) {
+                    xtempdate.splice(i,0,info.tempsList[i].datetime)
+                    ytempval.splice(i, 0, info.tempsList[i]._temp)
+                    xhumiddate.splice(i,0,info.humidsList[i].datetime)
+                    yhumidval.splice(i, 0, info.humidsList[i]._humidity)
+                }
+
+                var trace1 = {
+                        x: xtempdate,
+                        y: ytempval,
+                        type: 'scatter',
+                        mode: "lines",
+                        name: "Temperature",
+                        line: {color: '#7F7F7F'}
+                }
+                var trace2 = {
+                        x: xhumiddate,
+                        y: yhumidval,
+                        type: 'scatter',
+                        mode: "lines",
+                        name: "Humidity",
+                        line: {color: '#17BECF'}
+                }
+                var data = [trace1, trace2]
+
+                 Plotly.newPlot('temp-humid-line', data);
+                
                 tempUpdate.textContent = info.tempsList[0]._temp;  
                 humidUpdate.textContent = info.humidsList[0]._humidity;          
                 toggleUpdate.textContent = info.togglesList[0]._value;          
@@ -537,6 +587,29 @@
                 soilVal3.textContent = info.soilsList[2]._soil;
                 soilDate3.textContent = info.soilsList[2].datetime;
             })
+        </script>
+        <script>
+            function toggleToggle(button)
+            {
+                if(document.getElementById("toggleButton").value=="MANUAL OFF"){
+                document.getElementById("toggleButton").value="MANUAL ON";}
+
+                else if(document.getElementById("toggleButton").value=="MANUAL ON"){
+                document.getElementById("toggleButton").value="MANUAL OFF";}
+
+            }
+            function toggleAuto(button){
+                
+                if(document.getElementById("autoButton").value=="AUTO OFF"){
+                document.getElementById("autoButton").value="AUTO ON";
+                
+                }
+
+                else if(document.getElementById("autoButton").value=="AUTO ON"){
+                document.getElementById("autoButton").value="AUTO OFF";
+                }
+                document.getElementById("toggleButton").disabled = !document.getElementById("toggleButton").disabled;
+            }
         </script>
         
         <!-- jQuery -->
